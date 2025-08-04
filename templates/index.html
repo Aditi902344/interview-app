@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Customer List</h1>
+
+        <input type="text" id="search" placeholder="Search by name or email" />
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Order Count</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchCustomers() {
+            const res = await fetch("http://127.0.0.1:5000/customers");
+            const customers = await res.json();
+            displayCustomers(customers);
+        }
+
+        function displayCustomers(customers) {
+            const search = document.getElementById("search").value.toLowerCase();
+            const table = document.getElementById("customerTable");
+            table.innerHTML = "";
+
+            customers.forEach(customer => {
+                if (
+                    customer.name.toLowerCase().includes(search) ||
+                    customer.email.toLowerCase().includes(search)
+                ) {
+                    fetch(`http://127.0.0.1:5000/customers/${customer.id}`)
+                        .then(res => res.json())
+                        .then(details => {
+                            const row = `
+                                <tr>
+                                    <td>${details.id}</td>
+                                    <td>${details.name}</td>
+                                    <td>${details.email}</td>
+                                    <td>${details.phone}</td>
+                                    <td>${details.order_count}</td>
+                                </tr>
+                            `;
+                            table.innerHTML += row;
+                        });
+                }
+            });
+        }
+
+        document.getElementById("search").addEventListener("input", fetchCustomers);
+
+        window.onload = fetchCustomers;
+    </script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request
 import sqlite3
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
+
 DATABASE = 'ecommerce.db'
 
 def get_db_connection():
@@ -49,3 +50,11 @@ def internal_error(error):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+from flask import render_template
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
